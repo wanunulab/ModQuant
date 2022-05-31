@@ -11,7 +11,7 @@ print(wdir)
 cat("Initializing the package...")
 
 #source(paste(wdir,"/R/MakeOptions.R",sep = ""))
-source("MakeOptions.R")
+source("/R_Scripts/MakeOptions.R")
 
 
 
@@ -19,7 +19,7 @@ opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
 #source(paste(wdir,"/R/Feature_Preprocessing_Functions.R",sep = ""))
-source("Feature_Preprocessing_Functions.R")
+source("/R_Scripts/Feature_Preprocessing_Functions.R")
 
 
 #########Loading bam file########
