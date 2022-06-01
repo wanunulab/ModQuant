@@ -1,3 +1,2 @@
-# psiquant
-
-## Qunatification of ψ in native mRNA using machine learning models trained on basecalling and signal features from synthetic RNA constructs.  
+# ModQuant
+This package can be used to quantify site-specific RNA modifications in nanopore sequenced reads through supervised machine learning (ML) models that are trained with synthetic transcripts that replicate the sequence of the native reads and contain the modified or unmodified base (control) of interest. The labeled dataset for ML training comprises basecalling features and corresponding signal features from the ionic current of the aligned reads. The main input files for this tool are the aligned reads (bam file) and the resquiggled eventalign signal data generated through nanopolish (eventalign .txt and summary files). Our tool was developed for training ML models for quantifying the occupancy of ψ putative sites in native HeLa mRNA. For each site, a model was trained with a corresponding synthetic modified and unmodifed dataset. Please read the step by step guide on how to generate and prepare your data for ML training and testing.  
