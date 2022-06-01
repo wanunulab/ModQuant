@@ -9,8 +9,8 @@ Package requires only a standard computer with enough RAM (>=16GB recommended) a
 #### OS Requirements 
 This package is supported for Windows and macOS has been tested on the following systems:
 
-Windows10:19044.1706 
-mcOS:Catalina(10.15.6)
+  + Windows10:19044.1706 
+  + mcOS:Catalina(10.15.6)
 
 #### R Dependecies
 ##### R 
