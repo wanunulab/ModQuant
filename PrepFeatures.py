@@ -62,14 +62,16 @@ class TrainingPrep:
         if len(self.fname_control) > 1:
             for i in range(1, len(self.fname_control)):
                 additional_control_df = pd.read_csv(self.fname_control[i])
-                Control_features_df = Control_features_df.append(additional_control_df, ignore_index = True)
+                #Control_features_df = Control_features_df.append(additional_control_df, ignore_index = True)
+                Control_features_df = pd.concat([Control_features_df, additional_control_df])
         Control_features_df = Control_features_df.dropna()
 
         Modified_features_df = pd.read_csv(self.fname_modified[0])
         if len(self.fname_modified) > 1:
             for i in range(1, len(self.fname_modified)):
                 additional_control_df = pd.read_csv(self.fname_modified[i])
-                Modified_features_df = Modified_features_df.append(additional_control_df, ignore_index = True)
+                #Modified_features_df = Modified_features_df.append(additional_control_df, ignore_index = True)
+                Modified_features_df = pd.concat([Modified_features_df, additional_control_df])
         Modified_features_df = Modified_features_df.dropna()
 
         control_type_label = [self.controlLabel] * len(Control_features_df)
