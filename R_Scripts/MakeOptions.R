@@ -2,8 +2,22 @@
 ####    Make/define the main code options   ####
 #### ====================================== ####
 wdir = getwd( ) 
+
+args = commandArgs(trailingOnly = FALSE)
+file.path = strsplit(args[4], "=")
+#print(file.path)
+#print(file.path[[1]][2])
+file.path = strsplit(file.path[[1]][2], split="FeatureExtract.R")
+
+if (file.path[[1]] == ""){
+  source("R_Scripts/HandlePackages.R")
+} else{
+  source(paste(file.path[[1]], "/R_Scripts/HandlePackages.R", sep=""))
+}
+
 #source(paste(wdir,"/R/HandlePackages.R",sep = ""))
-source("HandlePackages.R")
+#source("HandlePackages.R")
+#source(paste(file.path[[1]], "/R_Scripts/HandlePackages.R", sep=""))
 
 
 option_list = list(

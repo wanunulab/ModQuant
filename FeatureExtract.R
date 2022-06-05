@@ -8,18 +8,42 @@ start.time = Sys.time()
 wdir = getwd( ) 
 print(wdir)
 
-cat("Initializing the package...")
+#input = file('stdin', 'r')
+#row = readLines(input, n=1)
+#print(row)##
 
+#options(echo=TRUE)
+args = commandArgs(trailingOnly = FALSE)
+file.path = strsplit(args[4], "=")
+print(file.path)
+print(file.path[[1]][2])
+file.path = strsplit(file.path[[1]][2], split="FeatureExtract.R")
+print(file.path)
+
+cat("Initializing feature extraction package...")
+
+if (file.path[[1]] == ""){
+  source("R_Scripts/MakeOptions.R")
+} else{
+  source(paste(file.path[[1]], "/R_Scripts/MakeOptions.R", sep=""))
+}
 #source(paste(wdir,"/R/MakeOptions.R",sep = ""))
-source("/R_Scripts/MakeOptions.R")
+#source(paste(file.path[[1]], "/R_Scripts/MakeOptions.R", sep=""))
+#source("R_Scripts/MakeOptions.R")
 
-
+if (file.path[[1]] == ""){
+  source("R_Scripts/Feature_Preprocessing_Functions.R")
+} else{
+  source(paste(file.path[[1]], "/R_Scripts/Feature_Preprocessing_Functions.R", sep=""))
+}
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
+
+
 #source(paste(wdir,"/R/Feature_Preprocessing_Functions.R",sep = ""))
-source("/R_Scripts/Feature_Preprocessing_Functions.R")
+#source(psate(file.path[[1]], "/R_Scripts/Feature_Preprocessing_Functions.R"))
 
 
 #########Loading bam file########
