@@ -37,14 +37,15 @@ Next, if you do not already have RStudio (>=4.0.1) on your system, download it f
 
 There are two ways to download the package: 
 
-#. Click on the green button on top left of this page that says 'code', then click on 'Download ZIP'. Then unzip the compressed file. Move the package into the directory of your choice.
-#. Open anaconda prompt and install git with ```conda install git``` and then go to your directory of choice and clone the package with ```git clone https://github.com/wanunulab/ModQuant.git```
+1) Click on the green button on top left of this page that says 'code', then click on 'Download ZIP'. Then unzip the compressed file. Move the package into the directory of your choice.
+
+2) Open anaconda prompt and install git with ```conda install git``` and then go to your directory of choice and clone the package with ```git clone https://github.com/wanunulab/ModQuant.git```
 
 Navigate to the directory where the package was downloaded.
 
 ```cd <\path\to\ModQuant>```
 
-Next, create an environement (python version 3.8) that has pip as dependency (required for downloading the other python dependencies) ```conda create -n <name_of_env> python=3.8 pip``` (takes around a minute) and then activate the environment with ```conda activate <name_of_env>```. Install all the required dependencies for the package with ```pip install -r requirements.txt``` (takes around a minute). You should now be able to print out all the versions of scikit-learn, numpy, and pandas downloaded along with the input options with ```python modML.py -h```  
+Next, create an environement (python version 3.8) that has pip as dependency (required for downloading the other python dependencies) ```conda create -n <name_of_env> python=3.8 pip``` (takes around a minute) and then activate the environment with ```conda activate <name_of_env>```. Install all the required dependencies for the package with ```pip install -r requirements.txt``` (takes around a minute). You should now be able to print out all the versions of scikit-learn, numpy, and pandas downloaded along with the input options with ```python modML.py -h``` 
 
 Next, you will need to download all the required R dependencies, which can be done in the anaconda command prompt. First, you will need to find the location of Rscript.exe if you did not set it up as an environment variable. From our system, the directory path is "C:\Program Files\R\R-4.0.1\bin\Rscript.exe". Next, run ```"<path_to_Rscript.exe>" FeatureExtract.R -h``` and the required R libraries will be installed. *Note that this might take some time (couple of minutes for our computer) and make sure to have the to your Rscript.exe in quotations*. The command prompt should print the input options. Now your environment is ready!
 
