@@ -39,6 +39,8 @@ There are two ways to download the package:
 
 1) Click on the green button on top left of this page that says 'code', then click on 'Download ZIP'. Then unzip the compressed file. Move the package into the directory of your choice.
 
+**OR**
+
 2) Open anaconda prompt and install git with ```conda install git``` and then go to your directory of choice and clone the package with ```git clone https://github.com/wanunulab/ModQuant.git```
 
 Navigate to the directory where the package was downloaded.
@@ -51,5 +53,17 @@ Next, you will need to download all the required R dependencies, which can be do
 
 *Note that you can run these commands from a different directory, just make sure to provide the correct directory path to modML.py and FeatureExtract.R in the command line*
 
+##ModQuant modules
 
+###Feature Extraction
+Parses basecalling and signal features from a user-specified location of interest on aligned RNA reads. Required input files are the sorted and indexed .bam file, the nanopolish eventalign .txt file that contains the resquiggled ionic current data from the **Fast5** files, and the nanopolish summary file. The output file is a .csv file with the user-specified features (columns) for every read (rows) that has passed the filtering conditions. To see the description of all the input options for feature extraction, run ```"<path_to_Rscript.exe>" FeatureExtract.R -h``` in the command line. 
+
+To run feature extraction on an example dataset, download the **MRPS14_updated_sorted.bam**, **MRPS14_updated_sorted.bam.bai**, **MRPS14_summary**, and **MRPS14.txt** files from [here](https://figshare.com/articles/dataset/Modified_Synthetic_mRNA_Training_Data/19950404). All four of these files are required for features to be extracted and compiled. Next, move them into a folder that indicates these files carry information about synthetic reads that replicate the mRNA sequence of MRPS14 bearing a site-specific pseudouridine modification. To extract the basecalls, quality scores, and 5-mer signal information (current mean, current standard deviation, and dwell-time) of the the modified pseudoruridine **target base position (-t)**, and the **2 neighboring bases in the 5' and 3' direction for a total of 5 (-n)** on MRPS14 synthetic reads with a **minimum read length (-l)** and **minimum mapping quality (-m)** of 565nt and 50, respectively, we can run the following in the command line:  
+
+```<path_to_Rscript.exe> FeatureExtract.R -b <path\to\MRPS14_updated_sorted.bam> -s <path\to\MRPS14_summary> -e <path\to\MRPS14.txt> -m 51 -l 566 -t 511 -r 15 -p 12 -n 5 -o <path\to\MRPS14_100_perc_modified_features.csv>```
+
+###Feature Preparation
+Prior to training ML models, the data containing the extracted features from the unmodified and modified reads needs to be labeled, combined, and prepared into one dataframe. The user has the option of adding the Fourier coefficients of the 5-mer current signals to the feature space. We can easily do this with the following command:
+
+```python PrepFeatures.py -cf ath\to\MRPS14_0_perc_unmodified_features.csv> -mf <path\to\MRPS14_100_perc_modified_features.csv> -fc 3 -o MRPS14_training_data```
 
