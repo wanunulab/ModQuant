@@ -58,20 +58,30 @@ class TrainingPrep:
     
     def preparetraining (self):
         '''Convert training data into pandas dataframe from csv files'''
-        Control_features_df = pd.read_csv(self.fname_control[0])
+        control_file_absolute_path_first = os.path.abspath(self.fname_control[0])
+        print(f'Control file path: {control_file_absolute_path_first}')
+        #Control_features_df = pd.read_csv(self.fname_control[0])
+        Control_features_df = pd.read_csv(control_file_absolute_path_first)
         if len(self.fname_control) > 1:
             for i in range(1, len(self.fname_control)):
-                additional_control_df = pd.read_csv(self.fname_control[i])
-                #Control_features_df = Control_features_df.append(additional_control_df, ignore_index = True)
+                additional_control_path = os.path.abspath(self.fname_control[i])
+                additional_control_df = pd.read_csv(additional_control_path)
+                #additional_control_df = pd.read_csv(self.fname_control[i])
+                ##Control_features_df = Control_features_df.append(additional_control_df, ignore_index = True)
                 Control_features_df = pd.concat([Control_features_df, additional_control_df])
         Control_features_df = Control_features_df.dropna()
 
-        Modified_features_df = pd.read_csv(self.fname_modified[0])
+        modified_file_absolute_path_first = os.path.abspath(self.fname_modified[0])
+        print(f'Modified file path: {modified_file_absolute_path_first}')
+        #Modified_features_df = pd.read_csv(self.fname_modified[0])
+        Modified_features_df = pd.read_csv(modified_file_absolute_path_first)
         if len(self.fname_modified) > 1:
             for i in range(1, len(self.fname_modified)):
-                additional_control_df = pd.read_csv(self.fname_modified[i])
+                additional_modified_path = os.path.abspath(self.fname_modified[i])
+                additional_modified_df = pd.read_csv(additional_modified_path)
+                #additional_modified_df = pd.read_csv(self.fname_modified[i])
                 #Modified_features_df = Modified_features_df.append(additional_control_df, ignore_index = True)
-                Modified_features_df = pd.concat([Modified_features_df, additional_control_df])
+                Modified_features_df = pd.concat([Modified_features_df, additional_modified_df])
         Modified_features_df = Modified_features_df.dropna()
 
         control_type_label = [self.controlLabel] * len(Control_features_df)
@@ -86,7 +96,7 @@ class TrainingPrep:
         Combined_df = Combined_df.dropna()
 
         #substring = "raw.current.samples"
-        substring = "raw_current"
+        substring = "raw"
         for (columnName, columnData) in Combined_df.iteritems():
             if substring in columnName:
                 Combined_df[columnName] = Combined_df[columnName].str.split(",")
@@ -137,13 +147,15 @@ def main():
     parser.add_argument('-fc', '--FourierCoeffs', nargs = '?', type = str, default = '3',
                         help = 'What Fourier coefficients do you want to extract from the signal?')
     parser.add_argument('-o', '--outputDataframe', nargs = '?', type = str, default = 'training_data',
-                        help = 'What do you want to name your prepared output training data (pandas datframe)?')
+                        help = 'What directory and name do you want for your prepared output training data (pandas datframe)?')
     
     args = parser.parse_args()
     main_prep = TrainingPrep(args.fnameControl, args.fnameModified, args.controlLabel, args.modifiedLabel, args.FourierCoeffs)
+    #main_prep = TrainingPrep(control_file_absolute_path, modified_file_absolute_path, args.controlLabel, args.modifiedLabel, args.FourierCoeffs)
+    
     training_dataframe, priorNANs, postNANs = main_prep.preparetraining()
     print(len(training_dataframe))
-    print(f"Size of original dataframe before NaN removal: {priorNANs}")
+    #print(f"Size of original dataframe before NaN removal: {priorNANs}")
     print(f"Size of original dataframe after NaN removal: {postNANs}")
 
     df_NaN = training_dataframe[training_dataframe.isna().any(axis=1)]
@@ -152,16 +164,20 @@ def main():
 
 
     ##########Adding Fourier coefficients to final dataframe#################
-    substring = "raw_current"
+    substring = "raw"
     #substring = "raw.current.samples"
 
     for (columnName, columnData) in training_dataframe.iteritems():
         if substring in columnName:
-            print(f"Column name: {columnName}")
+            print(f"Preparing Fourier coefficients for {columnName} samples")
             #print(training_dataframe[columnName])
             Current_Fourier_Coefficients, removed_events = main_prep.fourierCoefficients(events = training_dataframe[columnName], cutoff_freq = None)
             #print(len(Current_Fourier_Coefficients))
-            fft_col_name = columnName.split("_")
+            try:
+                fft_col_name = columnName.split("_")
+            except ValueError:
+                fft_col_name = columnName.split(".")
+
             if "upstream" in fft_col_name:
                 fft_col_name = f"kmer_{fft_col_name[0]}_{fft_col_name[-1]}"
             else:
@@ -182,7 +198,7 @@ def main():
             training_dataframe = pd.concat( [training_dataframe, Coeffs_df], axis = 1 )
 
     training_dataframe = training_dataframe.dropna()
-    print(f"Dropped Events that did not meet the minimum FC value: {removed_events}")
+    print(f"Number of dropped events that did not meet the minimum FC value: {removed_events}")
     print(training_dataframe)
 
     now = datetime.datetime.now()

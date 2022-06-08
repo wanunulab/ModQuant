@@ -166,7 +166,7 @@ read_filter_func <- function(whole.bam.df, min.mapping.qual.score = NULL, min.re
   }
   
   else if (!is.null(min.mapping.qual.score) && !is.null(min.read.length)){
-    cat("\nProvided both a minimum mampping quality and read length filter")
+    cat("\nProvided both a minimum mapping quality and read length filter")
     if (min.read.length <= 0 || min.mapping.qual.score < 0 || min.mapping.qual.score > 60){
       stop("\nError: Mapping quality score needs to be between zero and sixty and read length should be a value greater than zero!")
     }
@@ -237,13 +237,13 @@ feature_compile_func <- function(bam.input, summary.file, event.align.file,
   for (i in basecalls.and.5mers.positions) {
     
     if (i < 0){
-      name.basecalls = paste("b.n", abs(i), sep = "")
-      name.basequals = paste("q.n", abs(i), sep = "")
+      name.basecalls = paste("B.n", abs(i), sep = "")
+      name.basequals = paste("Q.n", abs(i), sep = "")
       
       name.samples = paste("raw.current.samples.n", abs(i), sep = "")
-      name.means = paste("signal.means.n", abs(i), sep = "")
-      name.stds = paste("signal.stds.n", abs(i), sep = "")
-      name.dts = paste("signal.dts.n", abs(i), sep = "")
+      name.means = paste("signal.mean.n", abs(i), sep = "")
+      name.stds = paste("signal.std.n", abs(i), sep = "")
+      name.dts = paste("signal.dt.n", abs(i), sep = "")
       
       assign(name.basecalls, c())
       assign(name.basequals, c())
@@ -255,13 +255,13 @@ feature_compile_func <- function(bam.input, summary.file, event.align.file,
     }
     
     if (i == 0){
-      name.basecalls = paste("b.", i, sep = "")
-      name.basequals = paste("q.", i, sep = "")
+      name.basecalls = paste("B.", i, sep = "")
+      name.basequals = paste("Q.", i, sep = "")
       
       name.samples = paste("raw.current.samples.", i, sep = "")
-      name.means = paste("signal.means.", i, sep = "")
-      name.stds = paste("signal.stds.", i, sep = "")
-      name.dts = paste("signal.dts.", i, sep = "")
+      name.means = paste("signal.mean.", i, sep = "")
+      name.stds = paste("signal.std.", i, sep = "")
+      name.dts = paste("signal.dt.", i, sep = "")
       
       assign(name.basecalls, c())
       assign(name.basequals, c())
@@ -273,13 +273,13 @@ feature_compile_func <- function(bam.input, summary.file, event.align.file,
     }
     
     if (i > 0){
-      name.basecalls = paste("b.p", i, sep = "")
-      name.basequals = paste("q.p", i, sep = "")
+      name.basecalls = paste("B.p", i, sep = "")
+      name.basequals = paste("Q.p", i, sep = "")
       
       name.samples = paste("raw.current.samples.p", i, sep = "")
-      name.means = paste("signal.means.p", i, sep = "")
-      name.stds = paste("signal.stds.p", i, sep = "")
-      name.dts = paste("signal.dts.p", i, sep = "")
+      name.means = paste("signal.mean.p", i, sep = "")
+      name.stds = paste("signal.std.p", i, sep = "")
+      name.dts = paste("signal.dt.p", i, sep = "")
       
       assign(name.basecalls, c())
       assign(name.basequals, c())
@@ -353,67 +353,67 @@ feature_compile_func <- function(bam.input, summary.file, event.align.file,
         
         if (current.local.pos < 0){
           
-          assign(paste("b.n", abs(current.local.pos), sep=""), 
-                 c(get(paste("b.n", abs(current.local.pos), sep="")), bc.tmp))
+          assign(paste("B.n", abs(current.local.pos), sep=""), 
+                 c(get(paste("B.n", abs(current.local.pos), sep="")), bc.tmp))
           
-          assign(paste("q.n", abs(current.local.pos), sep=""), 
-                 c(get(paste("q.n", abs(current.local.pos), sep="")), qs.tmp))
+          assign(paste("Q.n", abs(current.local.pos), sep=""), 
+                 c(get(paste("Q.n", abs(current.local.pos), sep="")), qs.tmp))
           
           assign(paste("raw.current.samples.n", abs(current.local.pos), sep=""), 
                  c(get(paste("raw.current.samples.n", abs(current.local.pos), sep="")), samples_string ))
           
-          assign(paste("signal.means.n", abs(current.local.pos), sep=""), 
-                 c(get(paste("signal.means.n", abs(current.local.pos), sep="")), meta.current.target$kmer_mean))
+          assign(paste("signal.mean.n", abs(current.local.pos), sep=""), 
+                 c(get(paste("signal.mean.n", abs(current.local.pos), sep="")), meta.current.target$kmer_mean))
           
-          assign(paste("signal.stds.n", abs(current.local.pos), sep=""), 
-                 c(get(paste("signal.stds.n", abs(current.local.pos), sep="")), meta.current.target$kmer_std))
+          assign(paste("signal.std.n", abs(current.local.pos), sep=""), 
+                 c(get(paste("signal.std.n", abs(current.local.pos), sep="")), meta.current.target$kmer_std))
           
-          assign(paste("signal.dts.n", abs(current.local.pos), sep=""), 
-                 c(get(paste("signal.dts.n", abs(current.local.pos), sep="")), meta.current.target$kmer_dt))
+          assign(paste("signal.dt.n", abs(current.local.pos), sep=""), 
+                 c(get(paste("signal.dt.n", abs(current.local.pos), sep="")), meta.current.target$kmer_dt))
           
         }
         
         if (current.local.pos == 0){
           
-          assign(paste("b.", current.local.pos, sep=""), 
-                 c(get(paste("b.", current.local.pos, sep="")), bc.tmp))
+          assign(paste("B.", current.local.pos, sep=""), 
+                 c(get(paste("B.", current.local.pos, sep="")), bc.tmp))
           
-          assign(paste("q.", current.local.pos, sep=""), 
-                 c(get(paste("q.", current.local.pos, sep="")), qs.tmp))
+          assign(paste("Q.", current.local.pos, sep=""), 
+                 c(get(paste("Q.", current.local.pos, sep="")), qs.tmp))
           
           assign(paste("raw.current.samples.", current.local.pos, sep=""), 
                  c(get(paste("raw.current.samples.", current.local.pos, sep="")), samples_string ))
           
-          assign(paste("signal.means.", current.local.pos, sep=""), 
-                 c(get(paste("signal.means.", current.local.pos, sep="")), meta.current.target$kmer_mean))
+          assign(paste("signal.mean.", current.local.pos, sep=""), 
+                 c(get(paste("signal.mean.", current.local.pos, sep="")), meta.current.target$kmer_mean))
           
-          assign(paste("signal.stds.", current.local.pos, sep=""), 
-                 c(get(paste("signal.stds.", current.local.pos, sep="")), meta.current.target$kmer_std))
+          assign(paste("signal.std.", current.local.pos, sep=""), 
+                 c(get(paste("signal.std.", current.local.pos, sep="")), meta.current.target$kmer_std))
           
-          assign(paste("signal.dts.", current.local.pos, sep=""), 
-                 c(get(paste("signal.dts.", current.local.pos, sep="")), meta.current.target$kmer_dt))
+          assign(paste("signal.dt.", current.local.pos, sep=""), 
+                 c(get(paste("signal.dt.", current.local.pos, sep="")), meta.current.target$kmer_dt))
           
         }
         
         if (current.local.pos > 0){
           
-          assign(paste("b.p", current.local.pos, sep=""), 
-                 c(get(paste("b.p", current.local.pos, sep="")), bc.tmp))
+          assign(paste("B.p", current.local.pos, sep=""), 
+                 c(get(paste("B.p", current.local.pos, sep="")), bc.tmp))
           
-          assign(paste("q.p", current.local.pos, sep=""), 
-                 c(get(paste("q.p", current.local.pos, sep="")), qs.tmp))
+          assign(paste("Q.p", current.local.pos, sep=""), 
+                 c(get(paste("Q.p", current.local.pos, sep="")), qs.tmp))
           
           assign(paste("raw.current.samples.p", current.local.pos, sep=""), 
                  c(get(paste("raw.current.samples.p", current.local.pos, sep="")), samples_string ))
           
-          assign(paste("signal.means.p", current.local.pos, sep=""), 
-                 c(get(paste("signal.means.p", current.local.pos, sep="")), meta.current.target$kmer_mean))
+          assign(paste("signal.mean.p", current.local.pos, sep=""), 
+                 c(get(paste("signal.mean.p", current.local.pos, sep="")), meta.current.target$kmer_mean))
           
-          assign(paste("signal.stds.p", current.local.pos, sep=""), 
-                 c(get(paste("signal.stds.p", current.local.pos, sep="")), meta.current.target$kmer_std))
+          assign(paste("signal.std.p", current.local.pos, sep=""), 
+                 c(get(paste("signal.std.p", current.local.pos, sep="")), meta.current.target$kmer_std))
           
-          assign(paste("signal.dts.p", current.local.pos, sep=""), 
-                 c(get(paste("signal.dts.p", current.local.pos, sep="")), meta.current.target$kmer_dt))
+          assign(paste("signal.dt.p", current.local.pos, sep=""), 
+                 c(get(paste("signal.dt.p", current.local.pos, sep="")), meta.current.target$kmer_dt))
           
         }
         
@@ -438,67 +438,67 @@ feature_compile_func <- function(bam.input, summary.file, event.align.file,
     
     if (current.local.pos < 0){
     
-      col_name = paste("b.n", abs(current.local.pos), sep="")
-      basecalls.df[col_name] = get(paste("b.n", abs(current.local.pos), sep=""))
+      col_name = paste("B.n", abs(current.local.pos), sep="")
+      basecalls.df[col_name] = get(paste("B.n", abs(current.local.pos), sep=""))
       
-      col_name = paste("q.n", abs(current.local.pos), sep="")
-      quality.scores.df[col_name] = get(paste("q.n", abs(current.local.pos), sep=""))
+      col_name = paste("Q.n", abs(current.local.pos), sep="")
+      quality.scores.df[col_name] = get(paste("Q.n", abs(current.local.pos), sep=""))
       
       col_name = paste("raw.current.samples.n", abs(current.local.pos), sep="")
       signal.current.samples.df[col_name] = get(paste("raw.current.samples.n", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.means.n", abs(current.local.pos), sep="")
-      signal.means.df[col_name] = get(paste("signal.means.n", abs(current.local.pos), sep=""))
+      col_name = paste("signal.mean.n", abs(current.local.pos), sep="")
+      signal.means.df[col_name] = get(paste("signal.mean.n", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.stds.n", abs(current.local.pos), sep="")
-      signal.stds.df[col_name] = get(paste("signal.stds.n", abs(current.local.pos), sep=""))
+      col_name = paste("signal.std.n", abs(current.local.pos), sep="")
+      signal.stds.df[col_name] = get(paste("signal.std.n", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.dts.n", abs(current.local.pos), sep="")
-      signal.dts.df[col_name] = get(paste("signal.dts.n", abs(current.local.pos), sep=""))
+      col_name = paste("signal.dt.n", abs(current.local.pos), sep="")
+      signal.dts.df[col_name] = get(paste("signal.dt.n", abs(current.local.pos), sep=""))
       
     }
     
     if (current.local.pos == 0){
       
-      col_name = paste("b.", abs(current.local.pos), sep="")
-      basecalls.df[col_name] = get(paste("b.", abs(current.local.pos), sep=""))
+      col_name = paste("B.", abs(current.local.pos), sep="")
+      basecalls.df[col_name] = get(paste("B.", abs(current.local.pos), sep=""))
       
-      col_name = paste("q.", abs(current.local.pos), sep="")
-      quality.scores.df[col_name] = get(paste("q.", abs(current.local.pos), sep=""))
+      col_name = paste("Q.", abs(current.local.pos), sep="")
+      quality.scores.df[col_name] = get(paste("Q.", abs(current.local.pos), sep=""))
       
       col_name = paste("raw.current.samples.", abs(current.local.pos), sep="")
       signal.current.samples.df[col_name] = get(paste("raw.current.samples.", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.means.", abs(current.local.pos), sep="")
-      signal.means.df[col_name] = get(paste("signal.means.", abs(current.local.pos), sep=""))
+      col_name = paste("signal.mean.", abs(current.local.pos), sep="")
+      signal.means.df[col_name] = get(paste("signal.mean.", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.stds.", abs(current.local.pos), sep="")
-      signal.stds.df[col_name] = get(paste("signal.stds.", abs(current.local.pos), sep=""))
+      col_name = paste("signal.std.", abs(current.local.pos), sep="")
+      signal.stds.df[col_name] = get(paste("signal.std.", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.dts.", abs(current.local.pos), sep="")
-      signal.dts.df[col_name] = get(paste("signal.dts.", abs(current.local.pos), sep=""))
+      col_name = paste("signal.dt.", abs(current.local.pos), sep="")
+      signal.dts.df[col_name] = get(paste("signal.dt.", abs(current.local.pos), sep=""))
       
     }
     
     if (current.local.pos > 0){
       
-      col_name = paste("b.p", abs(current.local.pos), sep="")
-      basecalls.df[col_name] = get(paste("b.p", abs(current.local.pos), sep=""))
+      col_name = paste("B.p", abs(current.local.pos), sep="")
+      basecalls.df[col_name] = get(paste("B.p", abs(current.local.pos), sep=""))
       
-      col_name = paste("q.p", abs(current.local.pos), sep="")
-      quality.scores.df[col_name] = get(paste("q.p", abs(current.local.pos), sep=""))
+      col_name = paste("Q.p", abs(current.local.pos), sep="")
+      quality.scores.df[col_name] = get(paste("Q.p", abs(current.local.pos), sep=""))
       
       col_name = paste("raw.current.samples.p", abs(current.local.pos), sep="")
       signal.current.samples.df[col_name] = get(paste("raw.current.samples.p", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.means.p", abs(current.local.pos), sep="")
-      signal.means.df[col_name] = get(paste("signal.means.p", abs(current.local.pos), sep=""))
+      col_name = paste("signal.mean.p", abs(current.local.pos), sep="")
+      signal.means.df[col_name] = get(paste("signal.mean.p", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.stds.p", abs(current.local.pos), sep="")
-      signal.stds.df[col_name] = get(paste("signal.stds.p", abs(current.local.pos), sep=""))
+      col_name = paste("signal.std.p", abs(current.local.pos), sep="")
+      signal.stds.df[col_name] = get(paste("signal.std.p", abs(current.local.pos), sep=""))
       
-      col_name = paste("signal.dts.p", abs(current.local.pos), sep="")
-      signal.dts.df[col_name] = get(paste("signal.dts.p", abs(current.local.pos), sep=""))
+      col_name = paste("signal.dt.p", abs(current.local.pos), sep="")
+      signal.dts.df[col_name] = get(paste("signal.dt.p", abs(current.local.pos), sep=""))
       
     
     }

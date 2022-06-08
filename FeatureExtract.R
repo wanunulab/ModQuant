@@ -15,10 +15,10 @@ print(wdir)
 #options(echo=TRUE)
 args = commandArgs(trailingOnly = FALSE)
 file.path = strsplit(args[4], "=")
-print(file.path)
-print(file.path[[1]][2])
+#print(file.path)
+#print(file.path[[1]][2])
 file.path = strsplit(file.path[[1]][2], split="FeatureExtract.R")
-print(file.path)
+#print(file.path)
 
 cat("Initializing feature extraction package...")
 
@@ -71,6 +71,16 @@ raw.signals.df = read.table(as.character(opt$eventalign_file), header = T)
 ###########Loading read input filters###############
 minimum.read.length = as.numeric(opt$minimum_read_length)
 minimum.mapping.score = as.numeric(opt$minimum_mapping_score)
+#cat(sprintf("\nMinimum read length filter: %0.0f nts", minimum.read.length))
+#cat(sprintf("\nMinimum mapping score: %0.0f ", minimum.mapping.score))
+
+if (is.na(minimum.read.length)){
+  minimum.read.length = NULL
+}
+
+if (is.na(minimum.mapping.score)){
+  minimum.mapping.score = NULL
+}
 ######################################################
 
 #########Loading feature extraction conditions###############

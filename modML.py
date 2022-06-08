@@ -116,7 +116,7 @@ class ModelTrain:
         	tt_data = self.removeFeatures(tt_data)
         feature_space = []
         removal_ID = "read_ID"
-        remove_samples = "raw_current"
+        remove_samples = "raw"
         remove_type = "type"
 
         for (columnName, columnData) in tt_data.iteritems():

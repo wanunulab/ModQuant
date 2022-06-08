@@ -28,9 +28,9 @@ option_list = list(
   make_option(c("-e", "--eventalign_file"), type="character", default="", 
               help="nanopolish event align file with raw signal data, Ex: ...", metavar="character"),
   
-  make_option(c("-m", "--minimum_mapping_score"), type="character", default=NULL, 
+  make_option(c("-m", "--minimum_mapping_score"), type="character", default="", 
               help="minimum mapping quality score for each read, Ex: ...", metavar="character"),
-  make_option(c("-l", "--minimum_read_length"), type="character", default=NULL, 
+  make_option(c("-l", "--minimum_read_length"), type="character", default="", 
               help="minimum length (nt) for each read, Ex: ...", metavar="character"),
   
   make_option(c("-t", "--target_position"), type="character", default="", 
