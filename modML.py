@@ -107,7 +107,8 @@ class ModelTrain:
 
     def train_test_model (self):
         '''Feature dropout function.'''
-        tt_data = self.numericalBases()
+        #tt_data = self.numericalBases() This step is now done in PrepFeatures.py
+        tt_data = self.training_dataframe
         tt_data = self.classRatio(tt_data)
       
         if self.excluded_features == '0':

@@ -55,6 +55,18 @@ class TrainingPrep:
             return sys.stdin
         else:
             return open(self.fname) 
+
+    def numericalBases (self, training_dataframe):
+        '''Convert basecalls to numerical values.'''
+        #le = preprocessing.LabelEncoder()
+        base_to_num_map = {'-':0, 'A':1, 'C':2, 'G':3, 'T':4}
+        substring = "B"
+        #updated_training_dataframe = self.training_dataframe
+        for (columnName, columnData) in training_dataframe.iteritems():
+            if substring in columnName:
+                #print("Hit Base Change")
+                training_dataframe = training_dataframe.replace({columnName:base_to_num_map})
+        return training_dataframe
     
     def preparetraining (self):
         '''Convert training data into pandas dataframe from csv files'''
@@ -91,9 +103,10 @@ class TrainingPrep:
 
         #frames = [Control_features_df, Modified_features_df]
         frames = [Modified_features_df, Control_features_df]
-        Combined_df = pd.concat(frames, ignore_index=True)
-        prior_NA = len(Combined_df)
-        Combined_df = Combined_df.dropna()
+        combined_df = pd.concat(frames, ignore_index=True)
+        prior_NA = len(combined_df)
+        #Combined_df = Combined_df.dropna()
+        Combined_df = self.numericalBases(combined_df) #Basecalls should be numeric values instead of A,C,G,T,- 
 
         #substring = "raw.current.samples"
         substring = "raw"

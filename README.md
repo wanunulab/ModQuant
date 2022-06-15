@@ -62,7 +62,13 @@ To run feature extraction on an example dataset, download the **MRPS14_updated_s
 ```<path_to_Rscript.exe> FeatureExtract.R -b <path\to\MRPS14_updated_sorted.bam> -s <path\to\MRPS14_summary> -e <path\to\MRPS14.txt> -m 51 -l 566 -t 511 -r 15 -p 12 -n 5 -o <path\to\MRPS14_100_perc_modified_features.csv>```
 
 ### Feature Preparation
-Prior to training ML models, the data containing the extracted features from the unmodified and modified reads needs to be labeled, combined, and prepared into one dataframe. The user has the option of adding the Fourier coefficients of the 5-mer current signals to the feature space. We can easily do this with the following command:
+Prior to training ML models, the data containing the extracted features from the unmodified and modified reads needs to be labeled, combined, and prepared into one dataframe. The user has the option of adding the Fourier coefficients of the 5-mer current signals to the feature space. By default, Fourier coefficients 2 and 3 are added to the feature space. We can easily do this with the following command:
 
-```python PrepFeatures.py -cf ath\to\MRPS14_0_perc_unmodified_features.csv> -mf <path\to\MRPS14_100_perc_modified_features.csv> -fc 3 -o MRPS14_training_data```
+```python PrepFeatures.py -cf path\to\MRPS14_0_perc_unmodified_features.csv> -mf <path\to\MRPS14_100_perc_modified_features.csv> -fc 3 -o MRPS14_training_data```
+The output will be a .pkl file stored in a folder called *prepared_training_data*. 
 
+### Training and testing machine learning models 
+Once the feature space is prepared with both modifed and unmodified reads, we can train a supervised machine learning model and assess the performance with the following command:
+
+```python modML.py -f <path\to\MRPS14_training_data>```
+The default model is a gradient boosting classifier and the default training-test split is 75-25. With the -h command you can see what other models are available and how to modify the training and testing ratios. The command line will output the accuracy of the model.
