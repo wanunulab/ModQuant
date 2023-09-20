@@ -31,11 +31,18 @@ if (file.path[[1]] == ""){
 #source(paste(file.path[[1]], "/R_Scripts/MakeOptions.R", sep=""))
 #source("R_Scripts/MakeOptions.R")
 
+###Uncomment this to add insertions###
 if (file.path[[1]] == ""){
-  source("R_Scripts/Feature_Preprocessing_Functions.R")
+  source("R_Scripts/Feature_Preprocessing_Functions_updated_test.R")#source("R_Scripts/Feature_Preprocessing_Functions.R")
 } else{
-  source(paste(file.path[[1]], "/R_Scripts/Feature_Preprocessing_Functions.R", sep=""))
+  source(paste(file.path[[1]], "/R_Scripts/Feature_Preprocessing_Functions_updated_test.R", sep=""))#source(paste(file.path[[1]], "/R_Scripts/Feature_Preprocessing_Functions.R", sep=""))
 }
+
+##if (file.path[[1]] == ""){
+##  source("R_Scripts/Feature_Preprocessing_Functions.R")
+##} else{
+##  source(paste(file.path[[1]], "/R_Scripts/Feature_Preprocessing_Functions.R", sep=""))
+##}
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
@@ -62,6 +69,7 @@ bam.df = as.data.frame(allD1)
 
 #######Loading eventalign summary file########
 summary = read.table(as.character(opt$summary_file), header = F, skip = 1)
+#print(summary)
 ##############################################
 
 #######Loading eventalign data file########
@@ -88,6 +96,7 @@ position.interest = as.numeric(opt$target_position)
 num.region.interest = as.numeric(opt$target_region)
 region.limit = as.numeric(opt$preserved_correct_calls)
 num.bases.5mers = as.numeric(opt$number_of_bases_and_5mers)
+con.insertions = as.character(opt$consider_insertions)
 #############################################################
 
 filtered.bam.df = read_filter_func(whole.bam.df = bam.df, 
@@ -96,13 +105,19 @@ filtered.bam.df = read_filter_func(whole.bam.df = bam.df,
 
 cat("\nExtracting Features...")
 
+cat("\nConsidering regions with insertions?")
+cat("\n")
+cat(con.insertions)
+
 features.df = feature_compile_func(bam.input = filtered.bam.df, 
                                    summary.file = summary, 
                                    event.align.file = raw.signals.df, 
                                    position.of.interest = position.interest, 
                                    num.region.of.interest = num.region.interest, 
                                    region.error.limit = region.limit,
-                                   num.bases.and.5mers = num.bases.5mers)
+                                   num.bases.and.5mers = num.bases.5mers,
+                                   consider.insertions = con.insertions)
+
 
 
 fwrite(features.df, opt$out, na = 'NA')

@@ -56,7 +56,7 @@ class TrainingPrep:
         else:
             return open(self.fname) 
 
-    def numericalBases (self, training_dataframe):
+    def numericalBases (self, training_dataframe:pd.DataFrame):
         '''Convert basecalls to numerical values.'''
         #le = preprocessing.LabelEncoder()
         base_to_num_map = {'-':0, 'A':1, 'C':2, 'G':3, 'T':4}
@@ -67,6 +67,53 @@ class TrainingPrep:
                 #print("Hit Base Change")
                 training_dataframe = training_dataframe.replace({columnName:base_to_num_map})
         return training_dataframe
+
+    def quartileCompute (self, kmers_):
+        '''Compute and add first quartile (25%), median (50%), and third quartile (75%) ionic current for every K-mer'''
+        #event.first_quartiles=[]
+        #event.medians=[]
+        #event.third_quartiles=[]
+        quartiles = []
+        for kmer_current in kmers_:
+            quant_array = np.quantile(kmer_current, [0.25, 0.5, 0.75], interpolation="midpoint")
+            quartiles.append([quant_array[0], quant_array[1], quant_array[2]])
+        return quartiles
+            #event.first_quartiles.append(quant_array[0])
+            #event.medians.append(quant_array[1])
+            #event.third_quartiles.append(quant_array[2])
+
+    def quantileSignal (self, training_dataframe:pd.DataFrame):
+        '''Compute and add first quartile (25%), median (50%), and third quartile (75%) ionic current for every K-mer'''
+        substring = "raw"
+        for (columnName, columnData) in training_dataframe.iteritems():
+            if substring in columnName:
+                print(f"Preparing quartile current values for {columnName} samples")
+                kmer_current_quant = self.quartileCompute(kmers_ = training_dataframe[columnName])#, cutoff_freq = None)
+                try:
+                    quant_col_name = columnName.split(".")
+                except ValueError:
+                    quant_col_name = columnName.split("_")
+
+                if "upstream" in quant_col_name:
+                    quant_col_name = f"kmer_{quant_col_name[0]}_{quant_col_name[-1]}"
+                else:
+                    quant_col_name = f"kmer_{quant_col_name[-1]}"
+                Quant_df = pd.DataFrame()
+                for kmer_quant in kmer_current_quant:
+                    d = {}
+                    for i in range(0, len(kmer_quant)): 
+                        d[f"Quartile_{i+1}_{quant_col_name}"] = round(kmer_quant[i], 3)
+                    #else:
+                    #    d[f"fc{i+1}_{fft_col_name}"] = float("NaN")
+                    #Coeffs_df = Coeffs_df.append(d, ignore_index = True) #pd.append is deprecated
+                    Quant_df = pd.concat([Quant_df, pd.DataFrame([d])], ignore_index = True)
+                Quant_df.reset_index(drop = True, inplace = True)
+                #print(Coeffs_df)
+                training_dataframe.reset_index(drop = True, inplace = True)
+                training_dataframe = pd.concat( [training_dataframe, Quant_df], axis = 1 )
+
+        return training_dataframe
+
     
     def preparetraining (self):
         '''Convert training data into pandas dataframe from csv files'''
@@ -81,20 +128,26 @@ class TrainingPrep:
                 #additional_control_df = pd.read_csv(self.fname_control[i])
                 ##Control_features_df = Control_features_df.append(additional_control_df, ignore_index = True)
                 Control_features_df = pd.concat([Control_features_df, additional_control_df])
+        print(f"Size of Control dataframe prior to dropping NaN reads: {len(Control_features_df)}")
         Control_features_df = Control_features_df.dropna()
+        print(f"Size of Control dataframe prior after dropping NaN reads: {len(Control_features_df)}")
+
 
         modified_file_absolute_path_first = os.path.abspath(self.fname_modified[0])
         print(f'Modified file path: {modified_file_absolute_path_first}')
         #Modified_features_df = pd.read_csv(self.fname_modified[0])
         Modified_features_df = pd.read_csv(modified_file_absolute_path_first)
         if len(self.fname_modified) > 1:
+            print("HIT")
             for i in range(1, len(self.fname_modified)):
                 additional_modified_path = os.path.abspath(self.fname_modified[i])
                 additional_modified_df = pd.read_csv(additional_modified_path)
                 #additional_modified_df = pd.read_csv(self.fname_modified[i])
                 #Modified_features_df = Modified_features_df.append(additional_control_df, ignore_index = True)
                 Modified_features_df = pd.concat([Modified_features_df, additional_modified_df])
+        print(f"Size of Modified dataframe prior to dropping NaN reads: {len(Modified_features_df)}")
         Modified_features_df = Modified_features_df.dropna()
+        print(f"Size of Modified dataframe prior after dropping NaN reads: {len(Modified_features_df)}")
 
         control_type_label = [self.controlLabel] * len(Control_features_df)
         mod_type_label = [self.modifiedLabel] * len(Modified_features_df)
@@ -157,7 +210,7 @@ def main():
                         help = 'What do you wish to label modified training data?')
     parser.add_argument('-lm', '--modifiedLabel', nargs = '?', type = str, default = 'modified',
                         help = 'What do you wish to label modified training data?')
-    parser.add_argument('-fc', '--FourierCoeffs', nargs = '?', type = str, default = '3',
+    parser.add_argument('-fc', '--FourierCoeffs', nargs = '?', type = str, default = '0',
                         help = 'What Fourier coefficients do you want to extract from the signal?')
     parser.add_argument('-o', '--outputDataframe', nargs = '?', type = str, default = 'training_data',
                         help = 'What directory and name do you want for your prepared output training data (pandas datframe)?')
@@ -179,47 +232,49 @@ def main():
     ##########Adding Fourier coefficients to final dataframe#################
     substring = "raw"
     #substring = "raw.current.samples"
+    if int(args.FourierCoeffs) > 0:
+        print("Adding Fourier Coefficients to the feature space")
+        for (columnName, columnData) in training_dataframe.iteritems():
+            if substring in columnName:
+                print(f"Preparing Fourier coefficients for {columnName} samples")
+                #print(training_dataframe[columnName])
+                Current_Fourier_Coefficients, removed_events = main_prep.fourierCoefficients(events = training_dataframe[columnName], cutoff_freq = None)
+                #print(len(Current_Fourier_Coefficients))
+                try:
+                    fft_col_name = columnName.split("_")
+                except ValueError:
+                    fft_col_name = columnName.split(".")
 
-    for (columnName, columnData) in training_dataframe.iteritems():
-        if substring in columnName:
-            print(f"Preparing Fourier coefficients for {columnName} samples")
-            #print(training_dataframe[columnName])
-            Current_Fourier_Coefficients, removed_events = main_prep.fourierCoefficients(events = training_dataframe[columnName], cutoff_freq = None)
-            #print(len(Current_Fourier_Coefficients))
-            try:
-                fft_col_name = columnName.split("_")
-            except ValueError:
-                fft_col_name = columnName.split(".")
+                if "upstream" in fft_col_name:
+                    fft_col_name = f"kmer_{fft_col_name[0]}_{fft_col_name[-1]}"
+                else:
+                    fft_col_name = f"kmer_{fft_col_name[-1]}"
+                Coeffs_df = pd.DataFrame()
+                for event_Coeffs in Current_Fourier_Coefficients:
+                    d = {}
+                    for i in range(1, int(args.FourierCoeffs)): #delete 1, to preserve first coefficient which equals current mean
+                        if not np.isnan(event_Coeffs[0]):
+                            d[f"fc{i+1}_{fft_col_name}"] = round(np.absolute(event_Coeffs[i]), 2)
+                        else:
+                            d[f"fc{i+1}_{fft_col_name}"] = float("NaN")
+                    #Coeffs_df = Coeffs_df.append(d, ignore_index = True) #pd.append is deprecated
+                    Coeffs_df = pd.concat([Coeffs_df, pd.DataFrame([d])], ignore_index = True)
+                Coeffs_df.reset_index(drop = True, inplace = True)
+                #print(Coeffs_df)
+                training_dataframe.reset_index(drop = True, inplace = True)
+                training_dataframe = pd.concat( [training_dataframe, Coeffs_df], axis = 1 )
 
-            if "upstream" in fft_col_name:
-                fft_col_name = f"kmer_{fft_col_name[0]}_{fft_col_name[-1]}"
-            else:
-                fft_col_name = f"kmer_{fft_col_name[-1]}"
-            Coeffs_df = pd.DataFrame()
-            for event_Coeffs in Current_Fourier_Coefficients:
-                d = {}
-                for i in range(1, int(args.FourierCoeffs)): #delete 1, to preserve first coefficient which equals current mean
-                    if not np.isnan(event_Coeffs[0]):
-                        d[f"fc{i+1}_{fft_col_name}"] = round(np.absolute(event_Coeffs[i]), 2)
-                    else:
-                        d[f"fc{i+1}_{fft_col_name}"] = float("NaN")
-                #Coeffs_df = Coeffs_df.append(d, ignore_index = True) #pd.append is deprecated
-                Coeffs_df = pd.concat([Coeffs_df, pd.DataFrame([d])], ignore_index = True)
-            Coeffs_df.reset_index(drop = True, inplace = True)
-            #print(Coeffs_df)
-            training_dataframe.reset_index(drop = True, inplace = True)
-            training_dataframe = pd.concat( [training_dataframe, Coeffs_df], axis = 1 )
-
+    training_dataframe = main_prep.quantileSignal(training_dataframe) #adding quartiles signal
     training_dataframe = training_dataframe.dropna()
-    print(f"Number of dropped events that did not meet the minimum FC value: {removed_events}")
+    #print(f"Number of dropped events that did not meet the minimum FC value: {removed_events}")
     print(training_dataframe)
 
     now = datetime.datetime.now()
-    training_data_directory = "prepared_training_data"
+    training_data_directory = "prepared_training_data_guppy_6.5.7"
     if not os.path.isdir(training_data_directory):
         os.system( f"mkdir {training_data_directory}" )
     os.chdir(training_data_directory)
-    training_dataframe.to_pickle(f"{args.outputDataframe}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}_{now.second}.pkl")
+    training_dataframe.to_pickle(f"{args.outputDataframe}_{now.month}{now.day}{now.year}_{now.hour}{now.minute}{now.second}.pkl")
 
 
 if __name__ == '__main__':

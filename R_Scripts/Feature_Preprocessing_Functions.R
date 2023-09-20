@@ -208,15 +208,15 @@ feature_compile_func <- function(bam.input, summary.file, event.align.file,
   pos.target.5mer.0 = position.of.interest - 3 
   
   region.of.interest = seq(position.of.interest-floor(num.region.of.interest/2), position.of.interest+floor(num.region.of.interest/2), 1)
-  target.bases = seq(position.of.interest-floor(num.bases.and.5mers/2), position.of.interest+floor(num.bases.and.5mers/2), 1)
+  target.bases = seq(position.of.interest-floor(num.bases.and.5mers/2), position.of.interest+floor(num.bases.and.5mers/2), 1) #(509, 510 ,511, 512, 513)
   
   
   
   # set up a vector with the positions of 5mer frames to extract from every read
-  pos.all.5mers = seq(pos.target.5mer.0-floor(num.bases.and.5mers/2), pos.target.5mer.0+floor(num.bases.and.5mers/2), 1)
+  pos.all.5mers = seq(pos.target.5mer.0-floor(num.bases.and.5mers/2), pos.target.5mer.0+floor(num.bases.and.5mers/2), 1) #(506 ,507, 508, 509, 510)
   
   # denotes variable and list names of 5mer frames in the selected region
-  basecalls.and.5mers.positions = seq(0-floor(num.bases.and.5mers/2), 0+floor(num.bases.and.5mers/2), 1)
+  basecalls.and.5mers.positions = seq(0-floor(num.bases.and.5mers/2), 0+floor(num.bases.and.5mers/2), 1)#(-2, -1, 0, +1, +2)
   
   # vector containing frames of 5mers that are of interest and order depends on rna strand
   all.5mer.frames = c()
@@ -227,7 +227,7 @@ feature_compile_func <- function(bam.input, summary.file, event.align.file,
       all.5mer.frames = c(all.5mer.frames, flipped.pos.all.5mers[idx])
     }
     if (rna.strand == "-"){
-      assign(name.5mer.positions, pos.all.5mers[idx])
+      ##assign(name.5mer.positions, pos.all.5mers[idx])##removed
       all.5mer.frames = c(all.5mer.frames, pos.all.5mers[idx])
     }
     idx = idx + 1
@@ -334,16 +334,28 @@ feature_compile_func <- function(bam.input, summary.file, event.align.file,
       ###############################################################################################
       read.IDs = c(read.IDs, read.name)
       ###############################################################################################
-      
       #Parse out bases of interest in the full read, remove insertions (for now)
       current.read.target.bases = seq.df[seq.df$pos %in% target.bases,] #(509, 510, 511, 512, 513)
       current.read.target.bases = current.read.target.bases[current.read.target.bases$base != "+", ]#Deletions can occur instead of U to C
-      
-      for (i in 1:length(all.5mer.frames)){
+      ######################################################
+      ###########Take reverse if strand is "-"##############
+      ##############Then take the complement################
+      if (rna.strand == "-"){
+        current.read.target.bases = apply(current.read.target.bases, 2, rev) #reverse the dataframe containing positions, basecalls, and quality scores
+        current.read.target.bases = as.data.frame(current.read.target.bases)
+        #current.read.target.bases$base <- gsub('A', 'T',
+        #           gsub('T', 'A',
+        #           gsub('G', 'C', 
+        #           gsub('C', 'G', current.read.target.bases$base)))) #take the complement of the basecalls in the dataframe
+        
+        current.read.target.bases$base = chartr("ACGT", "TGCA", current.read.target.bases$base)
+      }
+      #######################################################
+      for (i in 1:length(all.5mer.frames)){ #1, 2, 3, 4, 5
         current.frame.pos = all.5mer.frames[i] #(510, 509, 508, 507, 506)
         current.local.pos = basecalls.and.5mers.positions[i] #(-2, -1, 0, +1, +2)
         
-        bc.tmp = current.read.target.bases$base[i]
+        bc.tmp = current.read.target.bases$base[i] 
         qs.tmp = current.read.target.bases$base_quality[i]
         
         meta.current.target = raw_trace_meta_extract_func(read.raw.signal.df = read.raw.signal.df, 

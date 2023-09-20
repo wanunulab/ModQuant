@@ -41,6 +41,10 @@ option_list = list(
               help="minimum correct basecalls required inorder to parse features, Ex: ...", metavar="character"),
   make_option(c("-n", "--number_of_bases_and_5mers"), type="character", default="5", 
               help="number of basecalls and 5mer signal frames to extract, Ex: ...", metavar="character"),
+  ###Uncomment this to add insertions###
+  make_option(c("-i", "--consider_insertions"), type="character", default="yes", 
+              help="consider whether regions with insertions should be parsed, Ex: ...", metavar="character"),
+  
   
   make_option(c("-o", "--out"), type="character", default="Mod_Features.csv", 
               help="output file name of ML training dataframe, Ex: ...", metavar="character"))
