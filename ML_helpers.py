@@ -195,6 +195,7 @@ class ModelFitTest:
         'feature_imp':feature_imp
         }
         return result
+        
 
     def output_test_df_results(self,x_test:pd.DataFrame,y_test:pd.DataFrame,y_pred):
         '''
@@ -260,7 +261,7 @@ class IterateModel:
         self.n_splits=n_splits
         self.n_repeats=n_repeats
         self.n=self.n_splits*self.n_repeats
-        self.train_sample_sz=None
+        self.train_sample_sz=train_sample_sz
 
     def balance_dataframe(self):
         limiting_sample_size=min(self.df["type"].value_counts())
