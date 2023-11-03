@@ -53,39 +53,51 @@ Next, you will need to download all the required R dependencies, which can be do
 
 *Note that you can run these commands from a different directory, just make sure to provide the correct directory path to the modules in the command line*
 
-## Instructions for Basecalling, Sequence Alignment, and Resquiggling with 
+## Instructions for Basecalling, Sequence Alignment, and Resquiggling 
 ### Basecalling ONT Sequencing Data
 You will need to an ONT basecaller (Guppy or Dorado) on your system, which can be downloaded [here](https://community.nanoporetech.com/downloads) if you have an ONT account. Run the following command to basecall your DRS data with GPU-enabled Guppy:    
 
-```guppy/bin/guppy_basecaller -i <path\to\fast5\folder> -s <path\to\output\fastq\folder> -c guppy\data\rna_r9.4.1_70bps_hac.cfg -x auto -r --u_substitution```
+```guppy\bin\guppy_basecaller -i <path\to\fast5\folder> -s <path\to\output\fastq\folder> -c guppy\data\rna_r9.4.1_70bps_hac.cfg -x auto -r --u_substitution```
 
 ### Aligning DRS Data with Minimap2
 For this work, the sequence alignment tool we used was Minimap2, which can be downloaded [here](https://github.com/lh3/minimap2). The following commands should be run to prepare a sequence alignment file for each synthetic or native mRNA dataset containing the ψ-modified site of interest:
 
 1) Merge fastq sequencing files into one file: 
+
 ```cat path\to\fastqs\*.fastq > <filname>.fastq```
+
 2) Align merged fastq file with the corresponding reference file: 
+
 ```minimap2 -ax splice -uf -k14 <filename>.fastq > <filename>.sam```
+
 3) Convert .sam to .bam: 
+
 ```samtools view -h -Sb <filename>.sam > <filename>.bam```
+
 4) Sort the bam file: 
+
 ```samtools sort <filename>.bam -o <filename>_sorted.bam```
+
 5) Index the bam file to make a **.bai** file: 
+
 ```samtools index <filename>_sorted.bam``` 
 
 ### Aligning Ionic Current Data with Sequence Aligned Data using Nanopolish 
 Once you have downloaded the [Nanopolish package](https://github.com/jts/nanopolish), run the following commands to generate your resquiggled DRS data: 
 
 1) Index fast5 files with the merged fastq file: 
+
 ```./nanopolish index -d path\to\fast5\folder path\to\merged.fastq``` 
 This command may take some time and will output the following files: **.index**, **.index.fai**, **.index.gzi**, and **.index.readdb**.
+
 2) Run the *eventalign* resquiggle tool to create *eventalign* **summary** and *eventalign* **.txt** files:  
+
 ```./nanopolish eventalign --read path\to\merged.fastq --bam path\to\gene.bam --genome path\to\reference --scale-events > gene.txt --summary=gene_summary --samples --signal-index``` 
 
 
 ## ModQuant modules
 ### Feature Extraction
-Parses basecalling and signal features from a user-specified location of interest on aligned RNA reads. Required input files are the sorted and indexed .bam file, the nanopolish eventalign .txt file that contains the resquiggled ionic current data from the **Fast5** files, and the nanopolish summary file. The output file is a .csv file with the user-specified features (columns) for every read (rows) that has passed the filtering conditions. To see the description of all the input options for feature extraction, run ```"<path_to_Rscript.exe>" FeatureExtract.R -h``` in the command line. 
+Parses basecalling and signal features from a user-specified location of interest on aligned RNA reads. Required input files are the sorted and indexed .bam file, the nanopolish eventalign .txt file that contains the resquiggled ionic current data from the **Fast5** files, and the nanopolish summary file. The output file is a .csv file with the user-specified features (columns) for every read (rows) that has passed the filtering conditions. To see the description of all the input options for feature extraction, run ```path\to\Rscript.exe FeatureExtract.R -h``` in the command line. 
 
 To run feature extraction on our synthetic RNA standards, you will need to download the **.bam**, **.bam.bai**, *eventalign* **summary**, and *eventalign* **.txt** files from [here](https://discover.pennsieve.io/datasets/340). All four of these files are required for features to be extracted and compiled for each training set (and native  dataset). Next, move them into a folder that indicates these files carry information about synthetic reads that replicate the mRNA sequence of mRNA transcripts bearing a site-specific ψ modification. To extract the basecalls, quality scores, and k-mer signal information (mean, standard deviation, samples, and dwell-time of the ionic current) surrounding the ψ-modified site **target base position (-t)**, and the **2 neighboring bases in the 5' and 3' direction for a total of 5 (-n)** on synthetic or native reads with a **minimum read length (-l)** and **minimum mapping quality (-m)** of 550nt and 50, respectively, we can run the following in the command line:  
 
